@@ -1,6 +1,8 @@
+.idea/AIND-Sudoku.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
 .DS_Store
-__pycache__
-*.pyc
-
-sudoku-[0-9]*.zip
-sudoku-result-[0-9]*.json
+__pycache__/
+tests/.DS_Store
+tests/__pycache__/

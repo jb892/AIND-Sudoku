@@ -49,18 +49,25 @@ def naked_twins(values):
     """
     # TODO: Implement this function!
     for unit in unitlist:
-        unsolved = {box : values[box] for box in unit if len(values[box])>1}
+        # Unsolved dict contains a bunch of key-value pairs where len(value) > 1
+        #unsolved = {box : values[box] for box in unit if len(values[box])>1}
+
+        unsolved = {box : values[box] for box in unit if len(values[box]) == 2}
+
+        if len(unsolved) < 2:
+            continue
+
         countDict = {}
         countDict = {unsolved[box] : 0 for box in unsolved.keys() if unsolved[box] not in countDict.keys()}
         for val in unsolved.values():
             countDict[val] = countDict[val] + 1
-        naked_pairs = [key for key in countDict.keys() if countDict[key] > 1]
-        if len(naked_pairs) > 0:
-            digits = naked_pairs[0]
+        naked_pairs = [key for key in countDict.keys() if countDict[key] == 2]
+        for pair in naked_pairs:
+            digits = pair
             naked_pairs_keys = [key for key in unsolved.keys() if unsolved[key] == digits]
-            for box in unsolved.keys():
-                if box not in naked_pairs_keys:
-                    for digit in digits:
+            for box in unit:
+                for digit in digits:
+                    if len(values[box]) > 1 and box not in naked_pairs_keys:
                         values[box] = str(values[box]).replace(digit, '')
     return values
 
@@ -212,6 +219,23 @@ def solve(grid):
 if __name__ == "__main__":
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(grid2values(diag_sudoku_grid))
+
+    ### For Test Naked twins only!!! :
+    # before_naked_twins_1 = {'I6': '4', 'H9': '3', 'I2': '6', 'E8': '1', 'H3': '5', 'H7': '8', 'I7': '1', 'I4': '8',
+    #                         'H5': '6', 'F9': '7', 'G7': '6', 'G6': '3', 'G5': '2', 'E1': '8', 'G3': '1', 'G2': '8',
+    #                         'G1': '7', 'I1': '23', 'C8': '5', 'I3': '23', 'E5': '347', 'I5': '5', 'C9': '1', 'G9': '5',
+    #                         'G8': '4', 'A1': '1', 'A3': '4', 'A2': '237', 'A5': '9', 'A4': '2357', 'A7': '27',
+    #                         'A6': '257', 'C3': '8', 'C2': '237', 'C1': '23', 'E6': '579', 'C7': '9', 'C6': '6',
+    #                         'C5': '37', 'C4': '4', 'I9': '9', 'D8': '8', 'I8': '7', 'E4': '6', 'D9': '6', 'H8': '2',
+    #                         'F6': '125', 'A9': '8', 'G4': '9', 'A8': '6', 'E7': '345', 'E3': '379', 'F1': '6',
+    #                         'F2': '4', 'F3': '23', 'F4': '1235', 'F5': '8', 'E2': '37', 'F7': '35', 'F8': '9',
+    #                         'D2': '1', 'H1': '4', 'H6': '17', 'H2': '9', 'H4': '17', 'D3': '2379', 'B4': '27',
+    #                         'B5': '1', 'B6': '8', 'B7': '27', 'E9': '2', 'B1': '9', 'B2': '5', 'B3': '6', 'D6': '279',
+    #                         'D7': '34', 'D4': '237', 'D5': '347', 'B8': '3', 'B9': '4', 'D1': '5'}
+    # display(before_naked_twins_1)
+    # result = naked_twins(before_naked_twins_1)
+    # display(result)
+
     result = solve(diag_sudoku_grid)
     display(result)
 
