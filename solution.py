@@ -20,7 +20,6 @@ unitlist.append(diagonal_unit_DL2UR)
 units = extract_units(unitlist, boxes)
 peers = extract_peers(units, boxes)
 
-
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
 
@@ -49,8 +48,21 @@ def naked_twins(values):
     strategy repeatedly).
     """
     # TODO: Implement this function!
-    raise NotImplementedError
-
+    for unit in unitlist:
+        unsolved = {box : values[box] for box in unit if len(values[box])>1}
+        countDict = {}
+        countDict = {unsolved[box] : 0 for box in unsolved.keys() if unsolved[box] not in countDict.keys()}
+        for val in unsolved.values():
+            countDict[val] = countDict[val] + 1
+        naked_pairs = [key for key in countDict.keys() if countDict[key] > 1]
+        if len(naked_pairs) > 0:
+            digits = naked_pairs[0]
+            naked_pairs_keys = [key for key in unsolved.keys() if unsolved[key] == digits]
+            for box in unsolved.keys():
+                if box not in naked_pairs_keys:
+                    for digit in digits:
+                        values[box] = str(values[box]).replace(digit, '')
+    return values
 
 def eliminate(values):
     """Apply the eliminate strategy to a Sudoku puzzle
@@ -69,8 +81,12 @@ def eliminate(values):
         The values dictionary with the assigned values eliminated from peers
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
-
+    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+    for box in solved_values:
+        digit = values[box]
+        for peer in peers[box]:
+            values[peer] = values[peer].replace(digit, '')
+    return values
 
 def only_choice(values):
     """Apply the only choice strategy to a Sudoku puzzle
@@ -93,7 +109,12 @@ def only_choice(values):
     You should be able to complete this function by copying your code from the classroom
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    for unit in unitlist:
+        for digit in '123456789':
+            dplaces = [box for box in unit if digit in values[box]]
+            if len(dplaces) == 1:
+                values[dplaces[0]] = digit
+    return values
 
 
 def reduce_puzzle(values):
@@ -111,8 +132,17 @@ def reduce_puzzle(values):
         no longer produces any changes, or False if the puzzle is unsolvable 
     """
     # TODO: Copy your code from the classroom and modify it to complete this function
-    raise NotImplementedError
-
+    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+    stalled = False
+    while not stalled:
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+        values = eliminate(values)
+        values = only_choice(values)
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        stalled = solved_values_before == solved_values_after
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+    return values
 
 def search(values):
     """Apply depth first search to solve Sudoku puzzles in order to solve puzzles
@@ -134,7 +164,29 @@ def search(values):
     and extending it to call the naked twins strategy.
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    "Using depth-first search and propagation, create a search tree and solve the sudoku."
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values)
+    if values is False:
+        return False
+    # Choose one of the unfilled squares with the fewest possibilities
+    min_key = ''
+    min_len = 10
+    max_len = 0
+    for key in values.keys():
+        max_len = max(max_len, len(values[key]))
+        if len(values[key]) < min_len and len(values[key]) > 1:
+            min_key = key
+            min_len = len(values[key])
+    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
+    if max_len is 1:
+        return values
+    for digit in values[min_key]:
+        values_tmp = values.copy()
+        values_tmp[min_key] = digit
+        result = search(values_tmp)
+        if result:
+            return result
 
 
 def solve(grid):
